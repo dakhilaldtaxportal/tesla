@@ -2,6 +2,7 @@ services:
   - type: web
     name: riders-group-bot
     runtime: python
+    runtimeVersion: 3.11
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
@@ -16,7 +17,10 @@ services:
           name: riders-db
           property: connectionString
       - key: WEBHOOK_URL
-        sync: false
+        fromService:
+          name: riders-group-bot
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
       - key: WEBHOOK_SECRET
         sync: false
       - key: CLAIM_TIMEOUT_SECONDS
@@ -25,6 +29,8 @@ services:
         value: "1.0"
       - key: BROADCAST_RADIUS_KM
         value: "5.0"
+      - key: PYTHONUNBUFFERED
+        value: "true"
 
 databases:
   - name: riders-db
